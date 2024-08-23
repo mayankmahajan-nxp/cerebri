@@ -2,6 +2,9 @@
  * Copyright CogniPilot Foundation 2023
  * SPDX-License-Identifier: Apache-2.0
  */
+
+#define DT_DRV_COMPAT cerebri_actuators_vesc_can
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +29,7 @@
 
 LOG_MODULE_REGISTER(actuate_vesc_can, CONFIG_CEREBRI_ACTUATE_VESC_CAN_LOG_LEVEL);
 
-#define MY_STACK_SIZE 500
+#define MY_STACK_SIZE 4096
 #define MY_PRIORITY 4
 
 #ifndef M_PI
@@ -123,8 +126,11 @@ void actuate_vesc_can_entry_point(void* p0, void* p1, void* p2)
     ARG_UNUSED(p1);
     ARG_UNUSED(p2);
 
+    zros_node_init(&ctx->node, "actuate_vesc_can");
+    zros_sub_init(&ctx->sub_actuators, &ctx->node, &topic_actuators, &ctx->actuators, 1000);
+
     int err = 0;
-    for (int i = 0; i < CONFIG_CEREBRI_SYNAPSE_VESC_CAN_NUMBER; i++) {
+    for (int i = 0; i < CONFIG_CEREBRI_ACTUATE_VESC_CAN_NUMBER; i++) {
         actuator_vesc_can_t vesc_can = g_actuator_vesc_cans[i];
         k_usleep(1e6 / 1);
         initialize_canbus(&vesc_can);
@@ -148,7 +154,7 @@ void actuate_vesc_can_entry_point(void* p0, void* p1, void* p2)
         if (ctx->actuators.velocity_count < 1)
             continue;
 
-        for (int i = 0; i < CONFIG_CEREBRI_SYNAPSE_VESC_CAN_NUMBER; i++) {
+        for (int i = 0; i < CONFIG_CEREBRI_ACTUATE_VESC_CAN_NUMBER; i++) {
             actuator_vesc_can_t vesc_can = g_actuator_vesc_cans[i];
             if (!g_canbus_details[vesc_can.bus_id].ready) {
                 initialize_canbus(&vesc_can);
@@ -161,12 +167,13 @@ void actuate_vesc_can_entry_point(void* p0, void* p1, void* p2)
             // if (vesc_can.fd) {
             //     frame.flags = CAN_FRAME_FDF | CAN_FRAME_IDE;
             // }
-            int32_t erpm = vesc_can.pole_pair * ctx->actuators.velocity[vesc_can.index] * 60 / (2 * M_PI);
+            int32_t erpm = vesc_can.pole_pair * 60 * 60 / (2 * M_PI);
             frame.id = 768 + vesc_can.id;
             frame.data[0] = erpm >> 24 & 255;
             frame.data[1] = erpm >> 16 & 255;
             frame.data[2] = erpm >> 8 & 255;
             frame.data[3] = erpm & 255;
+            LOG_ERR("can - publishing: %d %d %d %d %d", frame.id, frame.data[0], frame.data[1], frame.data[2], frame.data[3]);
 
             // send can data
             err = can_send(vesc_can.device, &frame, K_NO_WAIT, NULL, NULL);

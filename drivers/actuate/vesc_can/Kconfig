@@ -3,11 +3,50 @@
 
 menuconfig CEREBRI_ACTUATE_VESC_CAN
   bool "Acuate Vesc CAN"
-  depends on CEREBRI_SYNAPSE_VESC_CAN
   help
     This option enables vesc can
 
 if CEREBRI_ACTUATE_VESC_CAN
+
+config CEREBRI_ACTUATE_VESC_CAN_NUMBER
+  int "Number of VESC"
+  default 1
+  range 1 8
+  help
+    num vesc
+
+config CEREBRI_ACTUATE_VESC_CAN_BUS_FD_0
+  bool "Use FD"
+  help
+    stuff
+
+config CEREBRI_ACTUATE_VESC_CAN_BUS_ALIAS_CAN_N_0
+  int "Bus alias"
+  default 2
+  range 0 5
+  help
+    num vesc
+
+config CEREBRI_ACTUATE_VESC_CAN_ID_0
+  int "VESC ID"
+  default 60
+  range 0 255
+  help
+    num vesc
+
+config CEREBRI_ACTUATE_VESC_CAN_ACTUATOR_VEL_IDX_0
+  int "vel index"
+  default 0
+  range 0 16
+  help
+    num vesc
+
+config CEREBRI_ACTUATE_VESC_CAN_POLE_PAIR_0
+  int "pole pair"
+  default 7
+  range 0 255
+  help
+    num vesc
 
 module = CEREBRI_ACTUATE_VESC_CAN
 module-str = actuate_vesc_can
