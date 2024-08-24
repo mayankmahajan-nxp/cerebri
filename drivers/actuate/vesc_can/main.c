@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define DT_DRV_COMPAT cerebri_actuators_vesc_can
+#define DT_DRV_COMPAT cerebri_vesc_can_actuators
 
 #include <math.h>
 #include <stdio.h>
@@ -12,11 +12,12 @@
 #include <zephyr/drivers/can.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/shell/shell.h>
 
 #include <zephyr/net/socket.h>
 #include <zephyr/net/socketcan.h>
 #include <zephyr/net/socketcan_utils.h>
-#include <zephyr/shell/shell.h>
+
 
 #include <zros/private/zros_node_struct.h>
 #include <zros/private/zros_sub_struct.h>
@@ -29,6 +30,7 @@
 
 LOG_MODULE_REGISTER(actuate_vesc_can, CONFIG_CEREBRI_ACTUATE_VESC_CAN_LOG_LEVEL);
 
+#define CONFIG_VESC_CAN_ACTUATORS_INIT_PRIORITY 50
 #define MY_STACK_SIZE 4096
 #define MY_PRIORITY 4
 
@@ -36,15 +38,30 @@ LOG_MODULE_REGISTER(actuate_vesc_can, CONFIG_CEREBRI_ACTUATE_VESC_CAN_LOG_LEVEL)
 #define M_PI 3.14159265358979323846
 #endif
 
-extern canbus_detail_t g_canbus_details[];
+canbus_detail_t g_canbus_details[] = {
+    { .ready = false },
+    { .ready = false },
+    { .ready = false },
+    { .ready = false },
+    { .ready = false },
+    { .ready = false }
+};
 
 extern actuator_vesc_can_t g_actuator_vesc_cans[];
 
-typedef struct _context {
-    struct zros_node node;
-    struct zros_sub sub_actuators;
+struct context {
     synapse_pb_Actuators actuators;
-} context;
+    synapse_pb_Status status;
+    struct zros_node node;
+    struct zros_sub sub_actuators, sub_status;
+    struct k_sem running;
+    size_t stack_size;
+    k_thread_stack_t* stack_area;
+    struct k_thread thread_data;
+    uint32_t test_pulse;
+    uint8_t num_actuators;
+    const actuator_pwm_t* actuator_pwms;
+}
 
 static context g_ctx = {
     .node = {},
