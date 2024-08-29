@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /* Copyright 2023 CogniPilot Foundation */
-#include <zephyr/dt-bindings/sensor/ina230.h>
+#include <zephyr/dt-bindings/sensor/ina226.h>
 
 / {
 	pwm_shell: pwm_shell {
@@ -37,7 +37,7 @@
 		can4 = &flexcan4;
 		can5 = &flexcan5;
 		/* power sensors */
-		power0 = &ina230;
+		power0 = &ina226;
 		/* safety button */
 		safety-button = &arming_button_mr_canhubk3_adap;
 		/* wheel odometry */
@@ -120,11 +120,11 @@
 	pinctrl-names = "default";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
 
-	ina230: ina230@40 {
-		compatible = "ti,ina230";
-		reg = <0x40>;
-		current-lsb-microamps = <10000>;
-		rshunt-micro-ohms = <2000>;
+	ina226: ina226@41 {
+		compatible = "ti,ina226";
+		reg = <0x41>;
+		current-lsb-microamps = <5000>;
+		rshunt-micro-ohms = <500>;
 	};
 };
 
@@ -133,4 +133,3 @@ uart0: &lpuart7 {
 	status = "okay";
 	current-speed = <115200>;
 };
-
