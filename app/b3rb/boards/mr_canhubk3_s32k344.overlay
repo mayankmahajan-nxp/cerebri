@@ -8,6 +8,30 @@
 #include <zephyr/dt-bindings/sensor/icm42688.h>
 
 / {
+	vesc_actuators: vesc_actuators {
+		status = "okay";
+		device = <&flexcan0>;
+		compatible = "cerebri,vesc_can-actuators";
+		// fd;
+		pub-wheel-odometry;
+		status-rate = <1>;
+
+		vesc_child_1 {
+			vesc-id = <0>;
+			pole-pair = <15>;
+			input-index = <0>;
+			input-type = "velocity";
+		};
+
+		vesc_child_2 {
+			vesc-id = <1>;
+			pole-pair = <15>;
+			input-index = <1>;
+			input-type = "velocity";
+		};
+	};
+
+	/*
 	pwm_actuators: pwm_actuators {
 		compatible = "cerebri,pwm-actuators";
 		aux0 {
@@ -47,6 +71,7 @@
 			use-nano-seconds;
 		};
 	};
+	*/
 
 	chosen {
 		zephyr,canbus = &flexcan3;
