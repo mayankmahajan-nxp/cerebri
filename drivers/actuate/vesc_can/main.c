@@ -208,36 +208,46 @@ static void actuate_vesc_can_update(struct context *ctx)
 	bool armed = ctx->status.arming == synapse_pb_Status_Arming_ARMING_ARMED;
 	int err = 0;
 
-	for (int i = 0; i < ctx->num_actuators; i++) {
-		struct actuator_vesc_can *act = &ctx->actuator_vesc_cans[i];
+	while (true) {
+		for (int i = 0; i < ctx->num_actuators; i++) {
+			struct actuator_vesc_can *act = &ctx->actuator_vesc_cans[i];
 
-		struct can_frame frame = {
-			.dlc = can_bytes_to_dlc(4),
-			.flags = CAN_FRAME_IDE,
-		};
-		double input = 0;
+			struct can_frame frame = {
+				.dlc = can_bytes_to_dlc(4),
+				.flags = CAN_FRAME_IDE,
+			};
+			double input = 0;
 
-		if (act->type == VESC_CAN_TYPE_VELOCITY && armed) {
-			input = ctx->actuators.velocity[act->index];
+			if (act->type == VESC_CAN_TYPE_VELOCITY && armed) {
+				input = ctx->actuators.velocity[act->index];
+			}
+
+			int32_t erpm = act->pole_pair * input * 60 / (2 * M_PI);
+			frame.id = 768 + act->vesc_id;
+			LOG_DBG("%s - trying to send to VESC ID: %d %x\n", act->label, act->vesc_id, frame.id);
+			frame.data[0] = erpm >> 24 & 255;
+			frame.data[1] = erpm >> 16 & 255;
+			frame.data[2] = erpm >> 8 & 255;
+			frame.data[3] = erpm & 255;
+
+			// send can data
+			g_send_count += 1;
+			LOG_DBG("1");
+			actuate_vesc_can_init(ctx);
+			LOG_DBG("2");
+			err = can_send(ctx->device, &frame, K_NO_WAIT, NULL, NULL);  // gives ENETUNREACH (114).
+			LOG_DBG("3");
+			if (err != 0) {
+				ctx->ready = false;
+				LOG_DBG("%s - send failed to VESC ID: %d (%d)\n", act->label, act->vesc_id,
+					err);
+				continue;
+			}
+			k_sleep(K_MSEC(1000));
+			perf_duration_stop(&control_latency);
 		}
 
-		int32_t erpm = act->pole_pair * input * 60 / (2 * M_PI);
-		frame.id = 768 + act->vesc_id;
-		frame.data[0] = erpm >> 24 & 255;
-		frame.data[1] = erpm >> 16 & 255;
-		frame.data[2] = erpm >> 8 & 255;
-		frame.data[3] = erpm & 255;
-
-		// send can data
-		g_send_count += 1;
-		err = can_send(ctx->device, &frame, K_NO_WAIT, NULL, NULL);
-		if (err != 0) {
-			ctx->ready = false;
-			LOG_ERR("%s - send failed to VESC ID: %d (%d)\n", act->label, act->vesc_id,
-				err);
-			continue;
-		}
-		perf_duration_stop(&control_latency);
+		k_sleep(K_MSEC(1000));
 	}
 }
 
