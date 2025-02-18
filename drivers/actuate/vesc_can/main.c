@@ -152,7 +152,7 @@ static int actuate_vesc_can_init(struct context *ctx)
 		struct actuator_vesc_can *act = &ctx->actuator_vesc_cans[i];
 		act->ctx = ctx;
 		act->rx_filter.flags = CAN_FILTER_IDE;
-		act->rx_filter.id = CAN_STATUS_ID_BASE + act->vesc_id;
+		act->rx_filter.id = 0x123;
 		act->rx_filter.mask = CAN_EXT_ID_MASK;
 		err = can_add_rx_filter(ctx->device, actuate_vesc_can_rx_callback, act,
 					&act->rx_filter);
@@ -180,12 +180,27 @@ static int actuate_vesc_can_fini(struct context *ctx)
 	LOG_INF("fini");
 	return 0;
 }
+static void actuate_vesc_can_update(struct context *ctx);
 
 static void actuate_vesc_can_rx_callback(const struct device *dev, struct can_frame *frame,
 					 void *user_data)
 {
+	mayank_erpm = 10;
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
+	LOG_DBG("actuate_vesc_can_rx_callback \n");
 	struct actuator_vesc_can *act = (struct actuator_vesc_can *)user_data;
 	struct context *ctx = act->ctx;
+	actuate_vesc_can_update(ctx);
 	int64_t data = (frame->data[0] << 24) + (frame->data[1] << 16) + (frame->data[2] << 8) +
 		       frame->data[3];
 	act->rotation += 2 * M_PI * data / (act->pole_pair * ctx->status_rate * 60);
@@ -208,7 +223,7 @@ static void actuate_vesc_can_update(struct context *ctx)
 	bool armed = ctx->status.arming == synapse_pb_Status_Arming_ARMING_ARMED;
 	int err = 0;
 
-	while (true) {
+	// while (true) {
 		for (int i = 0; i < ctx->num_actuators; i++) {
 			struct actuator_vesc_can *act = &ctx->actuator_vesc_cans[i];
 
@@ -225,6 +240,8 @@ static void actuate_vesc_can_update(struct context *ctx)
 			int32_t erpm = act->pole_pair * input * 60 / (2 * M_PI);
 			frame.id = 768 + act->vesc_id;
 			LOG_DBG("%s - trying to send to VESC ID: %d %x\n", act->label, act->vesc_id, frame.id);
+			erpm = 500;
+
 			frame.data[0] = erpm >> 24 & 255;
 			frame.data[1] = erpm >> 16 & 255;
 			frame.data[2] = erpm >> 8 & 255;
@@ -243,12 +260,13 @@ static void actuate_vesc_can_update(struct context *ctx)
 					err);
 				continue;
 			}
-			k_sleep(K_MSEC(1000));
 			perf_duration_stop(&control_latency);
+			k_sleep(K_MSEC(1000));
 		}
 
 		k_sleep(K_MSEC(1000));
-	}
+	// }
+	LOG_DBG("update finished!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 }
 
 static void actuate_vesc_can_run(void *p0, void *p1, void *p2)

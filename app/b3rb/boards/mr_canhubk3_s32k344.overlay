@@ -23,12 +23,6 @@
 			input-type = "velocity";
 		};
 
-		vesc_child_2 {
-			vesc-id = <1>;
-			pole-pair = <15>;
-			input-index = <1>;
-			input-type = "velocity";
-		};
 	};
 
 	/*
@@ -157,6 +151,7 @@
 
 &flexcan0 {
 	status = "okay";
+	bitrate = <500000>;
 };
 
 &flexcan1 {
