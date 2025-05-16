@@ -36,6 +36,7 @@ LOG_MODULE_REGISTER(zros_topic);
         (external_odometry, &topic_external_odometry, "external_odometry"),    \
         (imu, &topic_imu, "imu"),                                              \
         (joy, &topic_joy, "joy"),                                              \
+        (joy_farm, &topic_joy_farm, "joy_farm"),                               \
         (led_array, &topic_led_array, "led_array"),                            \
         (magnetic_field, &topic_magnetic_field, "magnetic_field"),             \
         (nav_sat_fix, &topic_nav_sat_fix, "nav_sat_fix"),                      \
@@ -190,6 +191,9 @@ int handle_msg(const struct shell* sh, struct zros_topic* topic, msg_handler_t* 
     } else if (topic == &topic_joy) {
         synapse_msgs_Joy msg = {};
         return handler(sh, topic, &msg, (snprint_t*)&snprint_joy);
+    } else if (topic == &topic_joy_farm) {
+        synapse_msgs_Joy msg = {};
+        return handler(sh, topic, &msg, (snprint_t*)&snprint_joy_farm);
     } else if (topic == &topic_led_array) {
         synapse_msgs_LEDArray msg = {};
         return handler(sh, topic, &msg, (snprint_t*)&snprint_ledarray);

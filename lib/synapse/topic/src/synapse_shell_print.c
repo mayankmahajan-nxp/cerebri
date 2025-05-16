@@ -193,6 +193,22 @@ int snprint_joy(char* buf, size_t n, synapse_msgs_Joy* m)
     return offset;
 }
 
+int snprint_joy_farm(char* buf, size_t n, synapse_msgs_Joy* m)
+{
+    size_t offset = 0;
+    offset += snprintf_cat(buf + offset, n - offset, "axes\n");
+    for (int i = 0; i < m->axes_count; i++) {
+        offset += snprintf_cat(buf + offset, n - offset, "%10.4f\n", m->axes[i]);
+    }
+
+    offset += snprintf_cat(buf + offset, n - offset, "buttons\n");
+    for (int i = 0; i < m->buttons_count; i++) {
+        offset += snprintf_cat(buf + offset, n - offset, "%10d\n", m->buttons[i]);
+    }
+    return offset;
+    return 0;
+}
+
 int snprint_ledarray(char* buf, size_t n, synapse_msgs_LEDArray* m)
 {
     size_t offset = 0;

@@ -52,6 +52,7 @@ static struct context g_ctx;
 // topic listeners
 TOPIC_LISTENER(bezier_trajectory, synapse_msgs_BezierTrajectory)
 TOPIC_LISTENER(joy, synapse_msgs_Joy)
+TOPIC_LISTENER(joy_farm, synapse_msgs_Joy)
 TOPIC_LISTENER(clock_offset, synapse_msgs_Time)
 #ifdef CONFIG_CEREBRI_DREAM_HIL
 TOPIC_LISTENER(battery_state, synapse_msgs_BatteryState)
@@ -126,6 +127,9 @@ static int init(struct context* ctx)
     if (ret < 0)
         return ret;
     ret = TF_AddTypeListener(&ctx->tf, SYNAPSE_JOY_TOPIC, joy_listener);
+    if (ret < 0)
+        return ret;
+    ret = TF_AddTypeListener(&ctx->tf, SYNAPSE_JOY_FARM_TOPIC, joy_farm_listener);
     if (ret < 0)
         return ret;
     ret = TF_AddTypeListener(&ctx->tf, SYNAPSE_CLOCK_OFFSET_TOPIC, clock_offset_listener);

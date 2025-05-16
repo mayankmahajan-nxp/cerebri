@@ -37,6 +37,8 @@ if (CONFIG_CEREBRI_B3RB_MANUAL)
   list(APPEND SOURCE_FILES src/manual.c)
 endif()
 
+list(APPEND SOURCE_FILES src/farming.c)
+
 if (CONFIG_CEREBRI_B3RB_POSITION)
   list(APPEND SOURCE_FILES
     src/position.c)

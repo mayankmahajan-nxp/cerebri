@@ -171,6 +171,7 @@ TOPIC_LISTENER(bezier_trajectory, synapse_msgs_BezierTrajectory)
 // cmd_vel requires custom
 // TOPIC_LISTENER(cmd_vel, synapse_msgs_Twist)
 TOPIC_LISTENER(joy, synapse_msgs_Joy)
+TOPIC_LISTENER(joy_farm, synapse_msgs_Joy)
 // TOPIC_LISTENER(led_array, synapse_msgs_LEDArray)
 TOPIC_LISTENER(clock_offset, synapse_msgs_Time)
 
@@ -263,6 +264,7 @@ static void ethernet_entry_point(context_t* ctx)
     TF_AddTypeListener(&ctx->tf, SYNAPSE_BEZIER_TRAJECTORY_TOPIC, bezier_trajectory_listener);
     TF_AddTypeListener(&ctx->tf, SYNAPSE_CMD_VEL_TOPIC, cmd_vel_listener);
     TF_AddTypeListener(&ctx->tf, SYNAPSE_JOY_TOPIC, joy_listener);
+    TF_AddTypeListener(&ctx->tf, SYNAPSE_JOY_FARM_TOPIC, joy_farm_listener);
     // TF_AddTypeListener(&ctx->tf, SYNAPSE_LED_ARRAY_TOPIC, led_array_listener);
     TF_AddTypeListener(&ctx->tf, SYNAPSE_CLOCK_OFFSET_TOPIC, clock_offset_listener);
 

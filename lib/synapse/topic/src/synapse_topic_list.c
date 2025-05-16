@@ -117,6 +117,7 @@ ZROS_TOPIC_DEFINE(cmd_vel, synapse_msgs_Twist);
 ZROS_TOPIC_DEFINE(status, synapse_msgs_Status);
 ZROS_TOPIC_DEFINE(imu, synapse_msgs_Imu);
 ZROS_TOPIC_DEFINE(joy, synapse_msgs_Joy);
+ZROS_TOPIC_DEFINE(joy_farm, synapse_msgs_Joy);
 ZROS_TOPIC_DEFINE(led_array, synapse_msgs_LEDArray);
 ZROS_TOPIC_DEFINE(magnetic_field, synapse_msgs_MagneticField);
 ZROS_TOPIC_DEFINE(nav_sat_fix, synapse_msgs_NavSatFix);
@@ -136,6 +137,7 @@ static struct zros_topic* topic_list[] = {
     &topic_status,
     &topic_imu,
     &topic_joy,
+    &topic_joy_farm,
     &topic_led_array,
     &topic_magnetic_field,
     &topic_nav_sat_fix,

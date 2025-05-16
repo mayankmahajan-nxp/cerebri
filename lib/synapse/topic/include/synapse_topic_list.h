@@ -66,6 +66,7 @@ ZROS_TOPIC_DECLARE(topic_estimator_odometry, synapse_msgs_Odometry);
 ZROS_TOPIC_DECLARE(topic_external_odometry, synapse_msgs_Odometry);
 ZROS_TOPIC_DECLARE(topic_imu, synapse_msgs_Imu);
 ZROS_TOPIC_DECLARE(topic_joy, synapse_msgs_Joy);
+ZROS_TOPIC_DECLARE(topic_joy_farm, synapse_msgs_Joy);
 ZROS_TOPIC_DECLARE(topic_led_array, synapse_msgs_LEDArray);
 ZROS_TOPIC_DECLARE(topic_magnetic_field, synapse_msgs_MagneticField);
 ZROS_TOPIC_DECLARE(topic_nav_sat_fix, synapse_msgs_NavSatFix);
