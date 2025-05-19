@@ -54,16 +54,15 @@ typedef struct actuator_pwm_t {
 	struct pwm_dt_spec device;
 } actuator_pwm_t;
 
-actuator_pwm_t g_actuator_pwms_farming[] = {
+actuator_pwm_t g_actuator_pwms_farming_1[] = {
 	{
-		// .min = CONFIG_CEREBRI_ACTUATE_PWM_PULSE_MIN_3,
-		// .max = CONFIG_CEREBRI_ACTUATE_PWM_PULSE_MAX_3,
-		// .center = CONFIG_CEREBRI_ACTUATE_PWM_PULSE_CENTER_3,
-		// .use_nano_seconds = false,
-		// .alias = CONFIG_CEREBRI_ACTUATE_PWM_OUTPUT_3,
-
-		// .index = CONFIG_CEREBRI_ACTUATE_PWM_INDEX_3,
 		.device = PWM_DT_SPEC_GET(DT_CHILD(DT_NODELABEL(pwm_shell), aux3)),
+	},
+};
+
+actuator_pwm_t g_actuator_pwms_farming_2[] = {
+	{
+		.device = PWM_DT_SPEC_GET(DT_CHILD(DT_NODELABEL(pwm_shell), aux4)),
 	},
 };
 
@@ -93,8 +92,12 @@ static void b3rb_farming_entry_point(void* p0, void* p1, void* p2)
             zros_sub_update(&ctx->sub_joy_farm);
         }
 
-        actuator_pwm_t pwm = g_actuator_pwms_farming[0];
-        err = pwm_set_pulse_dt(&pwm.device, PWM_USEC(ctx->joy_farm.axes[0] * 350 + 1500));
+        actuator_pwm_t pwm_1 = g_actuator_pwms_farming_1[0];
+        actuator_pwm_t pwm_2 = g_actuator_pwms_farming_2[0];
+        err = pwm_set_pulse_dt(&pwm_1.device, PWM_USEC(ctx->joy_farm.axes[0] * 350 + 1500));
+        err = pwm_set_pulse_dt(&pwm_2.device, PWM_USEC(ctx->joy_farm.axes[1] * 350 + 1500));
+        LOG_ERR("manual not receiving joy %f", ctx->joy_farm.axes[0]);
+        LOG_ERR("manual not receiving joy %f", ctx->joy_farm.axes[1]);
     }
 }
 

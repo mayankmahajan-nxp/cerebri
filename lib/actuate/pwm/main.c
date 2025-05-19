@@ -61,10 +61,10 @@ void pwm_update(const synapse_msgs_Status* status, const synapse_msgs_Actuators*
         err = pwm_set_pulse_dt(&g_ctx.pwm_enable, PWM_USEC(0));
     }
 
-    LOG_ERR("pwm_update start");
+    // LOG_ERR("pwm_update start");
     for (int i = 0; i < CONFIG_CEREBRI_ACTUATE_PWM_NUMBER; i++) {
         actuator_pwm_t pwm = g_actuator_pwms[i];
-        LOG_ERR("pwm_update %d %d %d", i, pwm.index, pwm.type);
+        // LOG_ERR("pwm_update %d %d %d", i, pwm.index, pwm.type);
         if (pwm.max < pwm.center || pwm.min > pwm.center) {
             LOG_ERR("config pwm_%d min, center, "
                     "max must monotonically increase",
@@ -112,7 +112,7 @@ void pwm_update(const synapse_msgs_Status* status, const synapse_msgs_Actuators*
             }
         }
 
-        LOG_ERR("pwm_update CONFIG_CEREBRI_ACTUATE_PWM_NUMBER %d %d", pwm.index, pulse);
+        // LOG_ERR("pwm_update CONFIG_CEREBRI_ACTUATE_PWM_NUMBER %d %d", pwm.index, pulse);
         if (pwm.use_nano_seconds) {
             err = pwm_set_pulse_dt(&pwm.device, PWM_NSEC(pulse));
         } else {
