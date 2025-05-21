@@ -2,6 +2,26 @@
 /* Copyright 2023 CogniPilot Foundation */
 #include <zephyr/dt-bindings/sensor/ina230.h>
 
+&eirq0_default {
+	group1 {
+		pinmux = <PTD15_EIRQ31>, <PTA18_EIRQ0>, <PTA25_EIRQ5>,
+			 <PTD5_EIRQ13>, <PTA11_EIRQ19>, <PTE1_EIRQ1>;
+		input-enable;
+	};
+};
+
+&gpioa_l {
+	status = "okay";
+};
+
+&gpioe_l {
+	status = "okay";
+};
+
+// Notes for using the external GPIO.
+// int-gpios = <&gpioa_l 11 GPIO_ACTIVE_LOW>; /* EXT_GPIO1 */
+// xshut-gpios = <&gpioe_l 1 GPIO_ACTIVE_HIGH>; /* EXT_GPIO2 */
+
 / {
 	pwm_shell: pwm_shell {
 		compatible = "pwm-leds";
@@ -133,4 +153,3 @@ uart0: &lpuart7 {
 	status = "okay";
 	current-speed = <115200>;
 };
-

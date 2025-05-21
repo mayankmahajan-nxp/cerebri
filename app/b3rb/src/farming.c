@@ -12,6 +12,7 @@
 #include <zros/zros_node.h>
 #include <zros/zros_pub.h>
 #include <zros/zros_sub.h>
+#include <zephyr/drivers/gpio.h>
 
 #include <synapse_topic_list.h>
 
@@ -66,6 +67,11 @@ actuator_pwm_t g_actuator_pwms_farming_2[] = {
 	},
 };
 
+#define USER_LED2_RED_NODE DT_NODELABEL(user_led2_red)
+const struct device *led_dev = DEVICE_DT_GET(DT_GPIO_CTLR(USER_LED2_RED_NODE, gpios));
+gpio_pin_t led_pin = DT_GPIO_PIN(USER_LED2_RED_NODE, gpios);
+gpio_flags_t led_flags = DT_GPIO_FLAGS(USER_LED2_RED_NODE, gpios);
+
 static void b3rb_farming_entry_point(void* p0, void* p1, void* p2)
 {
     LOG_INF("init");
@@ -80,6 +86,16 @@ static void b3rb_farming_entry_point(void* p0, void* p1, void* p2)
     };
 
     int err = 0;
+
+    if (!device_is_ready(led_dev)) {
+        printk("LED device not ready\n");
+        return;
+    }
+
+    int ret = gpio_pin_configure(led_dev, led_pin, GPIO_OUTPUT_ACTIVE | led_flags);
+    if (ret != 0) {
+        printk("Failed to configure LED pin\n");
+    }
 
     while (true) {
         int rc = 0;
@@ -98,6 +114,11 @@ static void b3rb_farming_entry_point(void* p0, void* p1, void* p2)
         err = pwm_set_pulse_dt(&pwm_2.device, PWM_USEC(ctx->joy_farm.axes[1] * 350 + 1500));
         LOG_ERR("manual not receiving joy %f", ctx->joy_farm.axes[0]);
         LOG_ERR("manual not receiving joy %f", ctx->joy_farm.axes[1]);
+
+        gpio_pin_set(led_dev, led_pin, 1);
+        k_sleep(K_MSEC(100));
+        gpio_pin_set(led_dev, led_pin, 0);
+        k_sleep(K_MSEC(1000));
     }
 }
 
