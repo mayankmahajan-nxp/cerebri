@@ -68,9 +68,13 @@ actuator_pwm_t g_actuator_pwms_farming_2[] = {
 };
 
 #define USER_LED2_RED_NODE DT_NODELABEL(user_led2_red)
+#define USER_LED3_RED_NODE DT_NODELABEL(user_led3_red)
 const struct device *led_dev = DEVICE_DT_GET(DT_GPIO_CTLR(USER_LED2_RED_NODE, gpios));
+const struct device *led_dev_2 = DEVICE_DT_GET(DT_GPIO_CTLR(USER_LED3_RED_NODE, gpios));
 gpio_pin_t led_pin = DT_GPIO_PIN(USER_LED2_RED_NODE, gpios);
+gpio_pin_t led_pin_2 = DT_GPIO_PIN(USER_LED3_RED_NODE, gpios);
 gpio_flags_t led_flags = DT_GPIO_FLAGS(USER_LED2_RED_NODE, gpios);
+gpio_flags_t led_flags_2 = DT_GPIO_FLAGS(USER_LED3_RED_NODE, gpios);
 
 static void b3rb_farming_entry_point(void* p0, void* p1, void* p2)
 {
@@ -97,6 +101,11 @@ static void b3rb_farming_entry_point(void* p0, void* p1, void* p2)
         printk("Failed to configure LED pin\n");
     }
 
+    ret = gpio_pin_configure(led_dev_2, led_pin_2, GPIO_OUTPUT_ACTIVE | led_flags_2);
+    if (ret != 0) {
+        printk("Failed to configure LED pin\n");
+    }
+
     while (true) {
         int rc = 0;
         rc = k_poll(events, ARRAY_SIZE(events), K_MSEC(1000));
@@ -115,10 +124,23 @@ static void b3rb_farming_entry_point(void* p0, void* p1, void* p2)
         LOG_ERR("manual not receiving joy %f", ctx->joy_farm.axes[0]);
         LOG_ERR("manual not receiving joy %f", ctx->joy_farm.axes[1]);
 
-        gpio_pin_set(led_dev, led_pin, 1);
-        k_sleep(K_MSEC(100));
-        gpio_pin_set(led_dev, led_pin, 0);
-        k_sleep(K_MSEC(1000));
+        if (ctx->joy_farm.axes[2] > 0.5) {
+            gpio_pin_set(led_dev, led_pin, 1);
+            k_sleep(K_MSEC(1000));
+            gpio_pin_set(led_dev, led_pin, 0);
+            k_sleep(K_MSEC(1000));
+            gpio_pin_set(led_dev, led_pin, 1);
+            k_sleep(K_MSEC(1000));
+            gpio_pin_set(led_dev, led_pin, 0);
+            k_sleep(K_MSEC(1000));
+        }
+
+        if (ctx->joy_farm.axes[3] > 0.5) {
+            gpio_pin_set(led_dev_2, led_pin_2, 1);
+            k_sleep(K_MSEC(1000));
+            gpio_pin_set(led_dev_2, led_pin_2, 0);
+            k_sleep(K_MSEC(1000));
+        }
     }
 }
 
